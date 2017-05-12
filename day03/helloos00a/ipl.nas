@@ -9,7 +9,7 @@ CYLS	EQU		10				; cylinders
 
 		JMP		entry
 		DB		0x90
-		DB		"HELLOIPL"		; 启动扇区名称（8字节） OEM name/version
+		DB		"HARIBOTE"		; 启动扇区名称（8字节） OEM name/version
 		DW		512			; 每个扇区（sector）大小（必须512字节）Number of bytes per sector
 		DB		1			; 簇（cluster）大小（必须为1个扇区）
 		DW		1			; FAT起始位置（一般为第一个扇区）
@@ -24,7 +24,7 @@ CYLS	EQU		10				; cylinders
 		DD		2880			; 重写一次磁盘大小
 		DB		0,0,0x29		; 意义不明（固定）
 		DD		0xffffffff		; （可能是）卷标号码
-		DB		"HELLO-OS   "		; 磁盘的名称（必须为11字?，不足填空格）
+		DB		"HARIBOTEOS "	; 磁盘的名称（必须为11字?，不足填空格）
 		DB		"FAT12   "		; 磁盘格式名称（必??8字?，不足填空格）
 		RESB	18				; 先空出18字节
 
@@ -60,28 +60,24 @@ retry:
 		INT		0x13			; 重置驱动器
 		JMP		retry
 next:
-		MOV		AX,ES			; 把内存地址后移0x200
+		MOV		AX, ES			; 把内存地址后移0x200
 		ADD		AX, 0x0020
 		MOV		ES, AX			; 因为没有ADD EX, 0x020指令
 		ADD 		CL, 1
 		CMP		CL, 18
-		JBE		readloop		； 如果CL <= 18 go to readloop
+		JBE		readloop		; 如果CL <= 18 go to readloop
 		MOV 		CL, 1
 		ADD 		DH, 1
 		CMP 		DH, 2
 		JB 		readloop
+		MOV		DH, 0
 		ADD 		CH, 1
 		CMP		CH, CYLS
 		JB 		readloop
 
 
 
-
 		JMP		0xc200
-
-fin:
-		HLT					; 让CPU停止，等待指令
-		JMP		fin			; 无限循环
 
 error:
 		MOV		SI,msg
@@ -94,9 +90,12 @@ putloop:
 		MOV		BX,15			; 指定字符颜色
 		INT		0x10			; 调用显卡BIOS
 		JMP		putloop
+fin:
+		HLT					; 让CPU停止，等待指令
+		JMP		fin			; 无限循环
 msg:
 		DB		0x0a, 0x0a		; 换行两次
-		DB		"hello, world"
+		DB		"load error"
 		DB		0x0a			; 换行
 		DB		0
 
