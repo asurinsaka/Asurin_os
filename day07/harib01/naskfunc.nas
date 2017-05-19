@@ -6,7 +6,7 @@
 [BITS 32]                                         ;     制作32位膜使用的机械语言
 [FILE   "naskfunc.nas"]                 ;   源程序文件名
 
-                GLOBAL      _io_hlt, _io_cli, _io_sti, io_stihlt
+                GLOBAL      _io_hlt, _io_cli, _io_sti, _io_stihlt
                 GLOBAL      _io_in8, _io_in16, _io_in32
                 GLOBAL      _io_out8, _io_out16, _io_out32
                 GLOBAL      _io_load_eflags, _io_store_eflags

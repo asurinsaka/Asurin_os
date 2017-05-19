@@ -1,5 +1,5 @@
 
-
+#include <stdio.h>
 #include "bootpack.h"
 
 void init_pic(void)
@@ -24,28 +24,32 @@ void init_pic(void)
     return;
 }
 
+
+#define PORT_KEYDAT         0x0060  /* keyboard */
+
+struct FIFO8 keyfifo;
+
 void inthandler21 (int *esp)
 /* 来自PS/2键盘的中断 */
 {
-    struct BOOTINFO *binfo = (struct BOOTINFO *) ADR_BOOTINFO;
-    boxfill8(binfo->vram ,binfo->scrnx, COL8_000000, 0, 0, 32 * 8 - 1, 15);
-    putfonts8_asc(binfo->vram, binfo->scrnx, 0, 0, COL8_FFFFFF, "INT 21 (IRQ-1) : PS/2 keyboard");
-    for (;;)
-    {
-        io_hlt();
-    }
+    unsigned char data;
+    io_out8(PIC0_OCW2, 0x61);       /* 通知PIC“IRQ-01已经受理完毕” */
+    data = io_in8(PORT_KEYDAT);
+    fifo8_put(&keyfifo, data);
+    return;
 }
+
+struct FIFO8 mousefifo;
 
 void inthandler2c(int *esp)
 /* 来自PS/2鼠标的中断 */
 {
-    struct BOOTINFO *binfo = (struct BOOTINFO *) ADR_BOOTINFO;
-    boxfill8(binfo->vram ,binfo->scrnx, COL8_000000, 0, 0, 32 * 8 - 1, 15);
-    putfonts8_asc(binfo->vram, binfo->scrnx, 0, 0, COL8_FFFFFF, "INT 21 (IRQ-1) : PS/2 mouse");
-    for (;;)
-    {
-        io_hlt();
-    }
+    unsigned char data;
+    io_out8(PIC1_OCW2, 0x64);       /* 通知PIC1 IRQ-12的受理已经完成 */
+    io_out8(PIC0_OCW2, 0x62);       /* 通知PIC0 IRQ-02的受理已经完成 */
+    data = io_in8(PORT_KEYDAT);
+    fifo8_put(&mousefifo, data);
+    return;
 }
 
 void inthandler27 (int *esp)
