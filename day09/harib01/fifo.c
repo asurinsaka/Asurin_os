@@ -1,4 +1,8 @@
-﻿#include "bootpack.h"
+
+
+#include "bootpack.h"
+
+#define FLAGS_OVERRUN           0x0001
 
 void fifo8_init(struct FIFO8 *fifo, int size, unsigned char *buf)
 /* initiate FIFO buffer */
@@ -11,8 +15,6 @@ void fifo8_init(struct FIFO8 *fifo, int size, unsigned char *buf)
     fifo->q = 0;        /* 下一个数据独处位置 */
     return;
 }
-
-#define FLAGS_OVERRUN       0x0001
 
 int fifo8_put(struct FIFO8 *fifo, unsigned char data)
 /* 向FIFO传送数据并保存 */
@@ -46,6 +48,7 @@ int fifo8_get(struct FIFO8 *fifo)
     fifo->free++;
     return data;
 }
+
 
 int fifo8_status(struct FIFO8 *fifo)
 /* 报告一下到底积攒了多少数据 */
